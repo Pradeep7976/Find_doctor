@@ -4,6 +4,7 @@ import {
   chakra,
   Container,
   Flex,
+  HStack,
   Icon,
   SimpleGrid,
   Text,
@@ -31,31 +32,11 @@ function TestimonialCard(props) {
           fontSize={"20px"}
           pb={4}
         >
-          {props.hname + " hospital"}
+          {props.tablet.charAt(0).toUpperCase() + props.tablet.slice(1)}
         </chakra.p>
         <chakra.p fontFamily={"Work Sans"} fontWeight={"bold"} fontSize={14}>
-          <chakra.span
-            fontFamily={"Inter"}
-            fontWeight={"medium"}
-            color={"gray.500"}
-          >
-            {props.street}
-          </chakra.span>
-          <chakra.span
-            fontFamily={"Inter"}
-            fontWeight={"medium"}
-            color={"gray.500"}
-          >
-            {"," + props.city}
-          </chakra.span>
           <Text fontFamily={"Almarai"} fontWeight={"300"}>
-            Mon-sat
-          </Text>
-          <Text fontFamily={"Almarai"} fontWeight={"300"}>
-            Available from {props.time} (24hrs)
-          </Text>
-          <Text fontFamily={"Almarai"} fontWeight={"300"}>
-            {props.cmpltadd}
+            {props.time}
           </Text>
         </chakra.p>
       </Flex>

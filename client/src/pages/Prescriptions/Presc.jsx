@@ -2,43 +2,38 @@ import {
   SimpleGrid,
   Text,
   Center,
-  HStack,
   Input,
   Button,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
   Box,
   Flex,
-  FormLabel,
 } from "@chakra-ui/react";
 
 import React, { useEffect, useState } from "react";
 
-import { BiSearchAlt2, BiFilter } from "react-icons/bi";
+import { BiChevronDown } from "react-icons/bi";
+import { BsSearch } from "react-icons/bs";
+import { GrAddCircle } from "react-icons/gr";
 
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
-import "./Doctors.css";
-import Docc from "../../components/Docc/Docc";
+import "./Presc.css";
+import Prescc from "../../components/Prescc/Prescc";
 import Nav from "../../components/Navbar";
 
-const url1 = "http://localhost:7000/doctors";
+const url1 = "http://localhost:7000/prescription";
 const port = "http://localhost:7000";
 
 function Doctors() {
   const [docdatai, setdocdatai] = useState([]);
-  const [filter, setfilter] = useState("Filter");
+  const [filter, setfilter] = useState("Disease");
   const [filterval, setfilterval] = useState("");
-  const [area, setarea] = useState("");
-  const [spec, setspec] = useState("");
+
   let navigate = useNavigate();
   useEffect(() => {
     axios
@@ -46,18 +41,29 @@ function Doctors() {
         headers: { "x-access-token": localStorage.getItem("token") },
       })
       .then((response) => {
-        console.log(localStorage.getItem("token"));
         if (!response.data.auth) {
           navigate("/login");
         }
       });
+
     axios
-      .get(url1)
+      .get(port + "/isUserAuth", {
+        headers: { "x-access-token": localStorage.getItem("token") },
+      })
+      .then((response) => {
+        // console.log(localStorage.getItem("token"));
+        if (!response.data.auth) {
+          navigate("/login");
+        }
+      });
+    const dat = { pid: localStorage.getItem("pid") };
+    axios
+      .post(url1, dat)
       .then((Response) => {
         console.log(Response.data);
         let data = Response.data;
         if (data.length === 0) {
-          alert("No Doctors Found");
+          alert("No Prescriptions Found");
         } else {
           setdocdatai(data);
         }
@@ -66,40 +72,22 @@ function Doctors() {
         console.log("error fetching data");
       });
     console.log("fetched");
+    // eslint-disable-next-line
   }, []);
 
   //search
 
-  const [search, setsearch] = useState("");
   function searchi() {
-    const searcc = search.charAt(0).toUpperCase() + search.slice(1);
-    if (area == "" || spec == "") {
-      alert("Enter area and specialization first");
-      return;
-    }
-    axios.post(port + "/search/" + area + "/" + spec).then((resp) => {
-      if (resp.data.length == 0) {
-        alert("NO doctors found");
-      }
-      setdocdatai(resp.data);
-    });
-  }
-  function filteri() {
-    if (area == "" || spec == "") {
-      alert("Enter City and specialization first");
-      return;
-    }
-    if (filter == "" || filterval == "") {
+    console.log(filterval);
+    if (filter === "" || filterval === "") {
       console.log(filter + " " + filterval);
       alert("apply filter first");
     }
     axios
-      .post(
-        port + "/filter/" + area + "/" + spec + "/" + filter + "/" + filterval
-      )
+      .post(port + "/filter/" + filter.toLowerCase() + "/" + filterval)
       .then((resp) => {
-        if (resp.data.length == 0) {
-          alert("NO doctors found");
+        if (resp.data.length === 0) {
+          alert("NO Prescriptions found");
         }
         setdocdatai(resp.data);
       });
@@ -109,47 +97,17 @@ function Doctors() {
       <Nav />
       <Center>
         <Text fontSize={40} fontFamily={"Josefin Sans"}>
-          Doctors
+          Prescriptions
         </Text>{" "}
       </Center>
-      <Flex>
-        <HStack marginLeft={"auto"} marginRight={"auto"}>
-          {/* <FormLabel>Location</FormLabel> */}
 
-          <Input
-            width={180}
-            height={35}
-            placeholder="City"
-            onChange={(e) => {
-              setarea(e.target.value);
-            }}
-          />
-          <Input
-            width={180}
-            height={35}
-            placeholder="Specialization"
-            onChange={(e) => {
-              setspec(e.target.value);
-            }}
-          />
-          <Button
-            className="sbtn"
-            // maxH={"3rem"}
-            fontFamily={"mono"}
-            fontWeight={"medium"}
-            onClick={searchi}
-          >
-            Search
-          </Button>
-        </HStack>
-      </Flex>
       <br />
       <Flex float={"right"} marginRight={6}>
         <Box>
           <Menu>
             <MenuButton
               as={Button}
-              rightIcon={<BiFilter />}
+              rightIcon={<BiChevronDown />}
               marginRight={2}
               variant="solid"
               backgroundColor={"#c7d4d1"}
@@ -160,17 +118,17 @@ function Doctors() {
             <MenuList>
               <MenuItem
                 onClick={() => {
-                  setfilter("Area");
+                  setfilter("Disease");
                 }}
               >
-                Area
+                Disease
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  setfilter("gender");
+                  setfilter("Hospital");
                 }}
               >
-                Gender
+                Hospital
               </MenuItem>
             </MenuList>
           </Menu>
@@ -188,11 +146,30 @@ function Doctors() {
 
             fontFamily={"mono"}
             fontWeight={"medium"}
-            onClick={filteri}
+            onClick={searchi}
+            rightIcon={<BsSearch />}
           >
-            Apply
+            search
           </Button>
         </Box>
+      </Flex>
+      <br />
+      <br />
+      <Flex float={"right"} marginRight={6}>
+        {/* <Box paddingTop={19} paddingRight={10} > */}
+        <Button
+          leftIcon={
+            <GrAddCircle
+              size={28}
+              onClick={() => {
+                navigate("/prescadd");
+              }}
+            />
+          }
+          color={"white"}
+        ></Button>
+
+        {/* </Box> */}
       </Flex>
       <br />
       <br />
@@ -203,18 +180,31 @@ function Doctors() {
         mx={10}
         className="doctors"
       >
-        {docdatai.map((cardinfo) => {
-          return (
-            <Docc
-              name={cardinfo.fname}
-              username={cardinfo.username}
-              specialization={cardinfo.specialization}
-              description={cardinfo.description}
-              date={cardinfo.yearofexperience + " years"}
-              did={cardinfo.did}
-              rating={cardinfo.rating}
-            />
-          );
+        {docdatai.map((card) => {
+          console.log("Cardinfo " + card.disease);
+          if (card.description != null) {
+            return (
+              <Prescc
+                disease={card.disease}
+                hospital={card.hospital}
+                // eslint-disable-next-line
+                description={card.description}
+                // eslint-disable-next-line
+                date={card.date}
+                prescid={card.prescid}
+              />
+            );
+          } else {
+            return (
+              <Prescc
+                disease={card.disease}
+                hospital={card.hospital}
+                description={""}
+                date={card.date.slice(0, 10)}
+                prescid={card.prescid}
+              />
+            );
+          }
         })}
       </SimpleGrid>
     </div>

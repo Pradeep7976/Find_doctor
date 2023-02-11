@@ -3,20 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ChakraProvider, theme } from "@chakra-ui/react";
 
 import Home from "./pages/Home/Home";
-import LoginP from "./pages/login/Loginp";
-// import RegesterR from "./pages/Regester_Receps/RegesterR";
-import DocForm from "./pages/Doc_reg/DocReg";
-import Doctors from "./pages/Doctors/Doctors";
-import Nav from "./components/Navbar";
-// import WaveB from "./components/WaveB/WaveB";
+import LoginP from "./pages/loginP/Loginp";
+import Prescs from "./pages/Prescriptions/Presc";
 import PReg from "./pages/PReg/PReg";
-import Temp from "./pages/Temp/Temp";
-import Docadd from "./pages/Docadd/Docadd";
-import Docdetail from "./pages/Docdetail/Docdetail";
+import Prescadd from "./pages/Prescadd/Prescadd";
+import Prescdetail from "./pages/Prescdetail/Prescdetail";
 import NoMatch from "./pages/Nomatch/NoMatch";
 
 import "./App.css";
-import Rate from "./components/Rating/Rate";
 
 function App() {
   return (
@@ -27,14 +21,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginP />} />
-            {/* <Route path="/regesterr" element={<RegesterR />} /> */}
-            <Route path="/docreg" element={<DocForm />} />
-            <Route path="/doctors" element={<Doctors />} />
+            <Route path="/presc" element={<Prescs />} />
             <Route path="/Preg" element={<PReg />} />
-            <Route path="/temp" element={<Temp />} />
-            <Route path="/docadd" element={<Docadd />} />
-            <Route path="/details/:did" element={<Docdetail />} />
-            <Route path="/rating" element={<Rate />} />
+            <Route path="/prescadd" element={<Prescadd />} />
+            <Route path="/details/:prescid" element={<Prescdetail />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
         </Router>

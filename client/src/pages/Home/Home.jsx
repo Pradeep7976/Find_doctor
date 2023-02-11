@@ -6,15 +6,11 @@ import {
   VStack,
   useBreakpointValue,
   Heading,
-  HStack,
-  Input,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 
 import axios from "axios";
 
-import Footer from "../../components/Footer/Footer";
-import Page2 from "./Part2/part2";
 
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
@@ -22,9 +18,11 @@ function Home() {
   const port = "http://localhost:7000";
   let navigate = useNavigate();
   function nav() {
-    navigate("/doctors");
+    navigate("/presc");
   }
-
+  function addnav() {
+    navigate("/prescadd");
+  }
   useEffect(() => {
     axios
       .get(port + "/isUserAuth", {
@@ -35,15 +33,17 @@ function Home() {
           navigate("/login");
         }
       });
+    // eslint-disable-next-line
   }, []);
 
   return (
     <div>
+      {/* <Nav /> */}
       <Flex
         w={"full"}
         h={"100vh"}
         backgroundImage={
-          "url(https://ik.imagekit.io/aj4rz7nxsa/DOC/tech46-3_eUOsnRzw4.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1665507293871)"
+          "url(https://ik.imagekit.io/aj4rz7nxsa/Smart_presc/3661875_hjhslGvle.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676142063492)"
         }
         backgroundSize={"cover"}
         backgroundPosition={"center center"}
@@ -55,14 +55,14 @@ function Home() {
           bgGradient={"linear(to-r, blackAlpha.600, transparent)"}
         >
           <Stack maxW={"2xl"} align={"flex-start"} spacing={6}>
-            <Heading color={"white"}>MED WAY!</Heading>
+            <Heading color={"white"}>Smart Prescription!</Heading>
             <Text
               color={"white"}
               fontWeight={700}
               lineHeight={1.2}
               fontSize={useBreakpointValue({ base: "xl", md: "2xl" })}
             >
-              Lorem ipsum dolor sit amet consectetur adipiscing elit sed
+              Way to store prescription smartly
             </Text>
             <Stack direction={"row"}>
               <Button
@@ -72,22 +72,21 @@ function Home() {
                 _hover={{ bg: "blue.500" }}
                 onClick={nav}
               >
-                Find doctors
+                View prescription
               </Button>
-              {/* <Button
-              bg={"whiteAlpha.300"}
-              rounded={"full"}
-              color={"white"}
-              _hover={{ bg: "whiteAlpha.500" }}
-            >
-              Show me more
-            </Button> */}
+              <Button
+                bg={"blue.400"}
+                rounded={"full"}
+                color={"white"}
+                _hover={{ bg: "blue.500" }}
+                onClick={addnav}
+              >
+                Add Prescription
+              </Button>
             </Stack>
           </Stack>
         </VStack>
       </Flex>
-      <Page2 />
-      <Footer />
     </div>
   );
 }

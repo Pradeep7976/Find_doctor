@@ -20,21 +20,10 @@ import {
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 
-const Links = ["Home", "Doctors"];
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={"/doctors"}
-  >
-    {children}
-  </Link>
-);
+const Links = [
+  { key: "Home", value: "/" },
+  { key: "pescriptions", value: "/presc" },
+];
 
 export default function Simple() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -42,6 +31,7 @@ export default function Simple() {
   function Logout() {
     console.log("Clicked");
     localStorage.clear();
+    navigate("/login");
   }
   return (
     <>
@@ -58,7 +48,7 @@ export default function Simple() {
             <Box>
               <Image
                 src={
-                  "https://ik.imagekit.io/aj4rz7nxsa/DOC/Doctor-Symbol-Caduceus-PNG-Picture_aeLKmZJW6.png"
+                  "https://ik.imagekit.io/aj4rz7nxsa/Smart_presc/prescription_1RhAMjiKV.png"
                 }
                 maxW={10}
               />
@@ -68,9 +58,8 @@ export default function Simple() {
               spacing={4}
               display={{ base: "none", md: "flex" }}
             >
-              {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
-              ))}
+              <Link href="/">Home</Link>
+              <Link href="/presc">Prescription</Link>
             </HStack>
           </HStack>
           <Flex alignItems={"center"}>
@@ -99,9 +88,9 @@ export default function Simple() {
         {isOpen ? (
           <Box pb={4} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
-              {Links.map((link) => (
+              {/* {Links.map((link) => (
                 <NavLink key={link}>{link}</NavLink>
-              ))}
+              ))} */}
             </Stack>
           </Box>
         ) : null}

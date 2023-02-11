@@ -8,7 +8,6 @@ const multer = require("multer");
 
 const app = express();
 
-const Recep = require("./model/reception");
 const Docrecep = require("./model/docreg");
 const Secret = "jwtsecret";
 const patient = require("./model/patient");
@@ -24,7 +23,7 @@ app.use(bodyParser.json());
 
 mongoose
   .connect(
-    "mongodb+srv://Pradeep:coder7976@cluster0.zs3kf.mongodb.net/Receptionist?retryWrites=true&w=majority"
+    "mongodb+srv://sinchana:sinch7@cluster0.cd2wqmb.mongodb.net/Receptionist?retryWrites=true&w=majority"
   )
   .then(() => {
     console.log("connected to mongo");
@@ -33,39 +32,20 @@ mongoose
     console.log("Error connecting to Database");
   });
 
-/////////////////////////////////////////////sql start/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////         sql Connection  /////////////////////////////////////////////////////////////////////
 
 const Client = require("pg").Pool;
 
 const client = new Client({
-  user: "Pradeep7976",
+  user: "sinchana",
   host: "db.bit.io",
-  database: "Pradeep7976/doctor",
-  password: "v2_3y55N_exuMZSB6nLzN7jGmL86HrV9",
+  database: "sinchana/Smartpresc",
+  password: "v2_3y7dQ_n5YVXwG4GJJ26C2EFPv8umu",
   port: 5432,
   ssl: true,
 });
 
-app.get("/sql", async (req, res) => {
-  let idi = 0;
-  try {
-    const id = await client.query(
-      `select * from id order by did desc `,
-      (err, result) => {
-        if (err) {
-          console.log("ERROR FETCHING ID");
-        } else {
-          idi = result.rows[0].did;
-          client.query(`insert into id values($1)`, [idi + 1]);
-        }
-      }
-    );
-  } catch (err) {
-    res.send(err);
-  }
-});
-
-/////////////////////////////////////////////////         sql end          /////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////         sql connection end        /////////////////////////////////////////////////////////////////////
 
 const verifyJwt = (req, res, next) => {
   const token = req.headers["x-access-token"];
@@ -108,7 +88,7 @@ app.post("/plogin", async (req, res) => {
     const email = User.email;
     try {
       client.query(
-        `select pid from patient where email=$1`,
+        `select pid from patients where email=$1`,
         [email1],
         (err, result) => {
           const token = jwt.sign({ email }, Secret, { expiresIn: 10000 });
@@ -136,6 +116,7 @@ app.post("/reg", async (req, res) => {
   const email = req.body.email;
   const address = req.body.address;
   const date = req.body.date;
+  const disease = req.body.gender;
   const Users = await patient.findOne({ email });
 
   const year = date.toString().slice(0, 4);
@@ -144,10 +125,11 @@ app.post("/reg", async (req, res) => {
   const datee = day + "-" + month + "-" + year;
   const data = {
     username: username,
-    password: password,
+    password: passwordHash,
     email: email,
     address: address,
     date: datee,
+    gender: gender,
   };
   console.log(datee);
   if (Users === null) {
@@ -175,13 +157,30 @@ app.post("/reg", async (req, res) => {
               pid + 1,
               pid,
             ]);
-            client.query(`insert into patient values($1,$2,$3,$4,$5)`, [
-              pid,
-              data.username,
-              data.date,
-              data.address,
-              data.email,
-            ]);
+            client.query(
+              `insert into patients values($1,$2,$3,$4,$5,$6,$7)`,
+              [
+                pid,
+                data.username,
+                data.date,
+                data.address,
+                data.gender,
+                data.password,
+                data.email,
+              ],
+              (err, resu) => {
+                if (resu) {
+                  // console.log(resu);
+                  console.log("DONE CREATING ACCOUNT");
+                } else {
+                  console.log("ERROR CREATING ACCOUNT");
+                  console.log("");
+                  console.log("");
+                  console.log("");
+                  console.log(err);
+                }
+              }
+            );
           }
         }
       );
@@ -202,62 +201,63 @@ app.post("/reg", async (req, res) => {
   ///
 });
 
-/////////////////////////////////////////////////////////          DOC REGESTER           //////////////////////////////////////////////////
+/////////////////////////////////////////////////////////          ADD Prescription           //////////////////////////////////////////////////
 
-app.post("/docreg", async (req, res) => {
+app.post("/presadd", async (req, res) => {
   const data = {
-    address: req.body.address,
-    email: req.body.email,
-    fname: req.body.fname,
-    lname: req.body.lname,
-    phno: req.body.phno,
-    specialization: req.body.specialization,
-    yrsofexp: req.body.yrsofexp,
-    fee: req.body.fee,
+    pid: req.body.pid,
+    disease: req.body.disease,
+    hospital: req.body.hospital,
+    date: req.body.date,
+    docname: req.body.docname,
+    medicine: req.body.medicine,
     description: req.body.description,
-    gender: req.body.gender.charAt(0),
   };
+  const year = data.date.toString().slice(0, 4);
+  const day = data.date.toString().slice(5, 7);
+  const month = data.date.toString().slice(8, 10);
+  const datee = day + "-" + month + "-" + year;
+  console.log(data);
+  // return;
   try {
     await client.query(
-      `select * from id order by did desc `,
+      `select * from id order by prescid desc `,
       async (err, result) => {
         if (err) {
           console.log("ERROR FETCHING ID");
           res.send();
         } else {
-          idi = result.rows[0].did;
-          did = result.rows[0].did;
-          // client.query(`insert into id values($1,$2)`, [idi,did + 1]);
-          client.query(`update id set did = $1 where did =$2;`, [did + 1, did]);
+          prescid = result.rows[0].prescid;
+          client.query(`update id set prescid = $1 where prescid =$2;`, [
+            prescid + 1,
+            prescid,
+          ]);
           await client.query(
-            `insert into doctor values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+            `insert into prescription values($1,$2,$3,$4,$5,$6,$7)`,
             [
-              did,
-              data.fname,
-              data.lname,
-              data.specialization,
-              data.email,
-              data.yrsofexp,
-              data.fee,
-              data.phno,
+              prescid,
+              data.disease,
+              data.hospital,
+              data.docname,
+              datee,
               data.description,
-              data.gender,
+              data.pid,
             ]
           );
 
-          data.address.map(async (add) => {
+          data.medicine.map(async (med) => {
             client.query(
-              `insert into adress values($1,$2,$3,$4,$5,$6)`,
-              [did, add.hospital, add.street, add.city, add.time, add.cmpltadd],
+              `insert into medicine values($1,$2,$3)`,
+              [prescid, med.medicinename, med.time],
               (err, res) => {
                 if (err) {
-                  console.log("ADDRESS");
+                  console.log("medicine");
                   console.log(err);
                 }
               }
             );
-            console.log("DONE UPLOAD");
           });
+          console.log("DONE UPLOAD");
         }
       }
     );
@@ -270,79 +270,48 @@ app.post("/docreg", async (req, res) => {
 
 ////////////////////////////////////////////////////       ALL DOCTORS         /////////////////////////////////////////////////////////////////
 
-app.get("/doctors", async (req, res) => {
-  // Docrecep.find({}).then((dat) => {
-  //   res.send(dat);
-  // });
+app.post("/prescription", async (req, res) => {
   try {
-    // const id = await client.query(
-    //   `select * from id order by pid desc `,
-    //   (err, result) => {
-    //     if (err) {
-    //       console.log("ERROR FETCHING ID");
-    //     } else {
-    //       idi = result.rows[0].did;
-    //       pid = result.rows[0].pid;
-    //       // client.query(`insert into id values($1,$2)`, [idi,pid + 1]);
-    //       client.query(`update id set pid = $1 where pid =$2;`, [pid + 1, pid]);
-    //       client.query(`insert into patient values($1,$2,$3,$4)`, [
-    //         pid,
-    //         data.username,
-    //         data.date,
-    //         data.address,
-    //       ]);
-    //     }
-    //   }
-    // );
-    await client.query(`select * from doctor`, (err, result) => {
-      if (err) {
-        console.log("ERROR FETCHING DATA");
-      } else {
-        res.send(result.rows);
+    await client.query(
+      `select * from prescription where pid =$1`,
+      [req.body.pid],
+      (err, result) => {
+        if (err) {
+          console.log("ERROR FETCHING DATA");
+        } else {
+          res.send(result.rows);
+        }
       }
-    });
+    );
   } catch (err) {
     res.send(err);
   }
 });
 //////////////////////////////////////////////////      full doctors details   ////////////////////////////////////////////////////////////
 
-app.get("/details/:did", async (req, res) => {
-  const did = req.params.did;
+app.get("/details/:prescid", async (req, res) => {
+  const prescid = req.params.prescid;
 
-  // await client.query(
-  //   `select * from doctor join adress on doctor.did=adress.did where doctor.did = $1`,
-  //   [did],
-  //   (err, result) => {
-  //     if (err) {
-  //       res.status(500).json({ err: "Fetching data err" });
-  //       return;
-  //     } else {
-  //       res.send(result.rows);
-  //       console.log(result);
-  //     }
-  //   }
-  // );
   await client.query(
-    `select * from doctor where doctor.did = $1`,
-    [did],
+    `select * from prescription where prescription.prescid = $1`,
+    [prescid],
     (err, result) => {
       if (err) {
-        res.status(500).json({ err: "Fetching doctor data err" });
+        res.status(500).json({ err: "Fetching prescription data err" });
         return;
       } else {
-        const doc = result.rows;
+        const presc = result.rows;
         client.query(
-          `select * from adress where did = $1`,
-          [did],
+          `select * from medicine where prescid = $1`,
+          [prescid],
           (err, result1) => {
             if (err) {
               res.status(500).json({ err: "Fetching time failed" });
             } else {
-              console.log(doc);
-              console.log(result1.rows);
-
-              res.status(200).json({ doctor: doc, time: result1.rows });
+              console.log("SENT THE DETAILS");
+              res
+                .status(200)
+                .json({ prescription: presc, medicine: result1.rows });
             }
           }
         );
@@ -351,43 +320,18 @@ app.get("/details/:did", async (req, res) => {
   );
 });
 
-//////////////////////////////////////////////////        search doctors      ////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////        Search doctors      ////////////////////////////////////////////////////////////////
 
-app.post("/search/:city/:spec", (req, res) => {
-  const user = req.body.username;
-  const city = req.params.city;
-  const spec = req.params.spec;
-  try {
-    client.query(
-      `select * from doctor join adress on doctor.did=adress.did where adress.city=$1 and doctor.specialization=$2 ;`,
-      [city, spec],
-      (err, result) => {
-        if (err) {
-          res.send("err");
-        } else {
-          res.send(result.rows);
-          console.log(result.rows);
-        }
-      }
-    );
-  } catch (err) {
-    res.send(err);
-  }
-});
-
-app.post("/filter/:city/:spec/:filter/:filterval", (req, res) => {
-  const city = req.params.city;
-  const spec = req.params.spec;
+app.post("/filter/:filter/:filterval", (req, res) => {
   const filter = req.params.filter;
   let filterval = req.params.filterval;
-  if (filter == "gender") {
-    filterval = req.params.filterval.charAt(0);
-  }
+
+  console.log(filter + filterval);
   try {
-    if (filter == "gender") {
+    if (filter == "disease") {
       client.query(
-        `select * from doctor join adress on doctor.did=adress.did where adress.city=$1 and specialization=$2 and gender=$3 ;`,
-        [city, spec, filterval],
+        `select * from prescription where disease=$1 ;`,
+        [filterval],
         (err, result) => {
           if (err) {
             res.send(err);
@@ -397,10 +341,10 @@ app.post("/filter/:city/:spec/:filter/:filterval", (req, res) => {
           }
         }
       );
-    } else if (filter == "Area") {
+    } else if (filter == "hospital") {
       client.query(
-        `select * from doctor join adress on doctor.did=adress.did where adress.city=$1 and specialization=$2 and adress.street=$3 ;`,
-        [city, spec, filterval],
+        `select * from prescription where hospital=$1 ; ;`,
+        [filterval],
         (err, result) => {
           if (err) {
             res.send(err);
@@ -415,132 +359,7 @@ app.post("/filter/:city/:spec/:filter/:filterval", (req, res) => {
     res.send(err);
   }
 });
-////////////////////////////////////////////////////      rating         //////////////////////////////////////////////
 
-app.post("/rating", async (req, res) => {
-  const did = req.body.did;
-  const pid = req.body.pid;
-  const rating = req.body.rating;
-  const review = req.body.review;
-  const data = {
-    did: did,
-    pid: pid,
-    rating: rating,
-    review: review,
-  };
-  try {
-    console.log(data);
-    await client.query(
-      `insert into rating values($1,$2,$3,$4)`,
-      [did, rating, review, pid],
-      (err, resul) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(resul);
-        }
-      }
-    );
-    console.log("DONE upload rating");
-  } catch (err) {
-    res.send(err);
-  }
-});
-app.post("/review", async (req, res) => {
-  console.log(req.body.did);
-  const did = req.body.did;
-  try {
-    await client.query(
-      `select * from rating where did=$1`,
-      [did],
-      (err, result) => {
-        if (err) console.log(err);
-        console.log(result.rows);
-        res.send(result.rows);
-      }
-    );
-    // res.send()
-  } catch (err) {
-    res.send(err);
-  }
-});
-///////////////////////////////////////////////////////////////          get name        ///////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////          get name        ///////////////////////////////////////////////////
-app.post("/getname", async (req, res) => {
-  const pid = req.body.pid;
-  console.log(pid + " sdfsdf");
-  try {
-    await client.query(
-      `select * from patient where pid=$1`,
-      [pid],
-      (err, result) => {
-        if (err) console.log(err);
-        console.log(result.rows[0].username);
-        res.send(result.rows[0].username);
-      }
-    );
-    // res.send()
-  } catch (err) {
-    res.send(err);
-  }
-});
-
-///////////////////////////////////////////////////////////////          get name        ////////////////////////////////
-app.get("/deletedoc", (req, res) => {
-  const email = req.body.username;
-  console.log(email);
-  Docrecep.deleteMany({ username: email }).then((result) => {
-    res.send("done");
-  });
-});
-app.get("/android", (req, res) => {
-  res.send("Congo Bro");
-});
-////////////////////////////////////////////////////////////////      image storage         /////////////////////////////////////////////////////////////////////////////////////////
-const Storage = multer.diskStorage({
-  destination: "uploads",
-  filename: (req, file, cb) => {
-    cb(null, Date.now + file.originalname);
-  },
-});
-const upload = multer({
-  storage: Storage,
-}).single("testImage");
-
-/////////////////////////////////////////////////////////////////////         Image storage           ////////////////////////
-
-app.post("/upload", (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      const newImage = new imageModel({
-        name: req.body.name,
-        image: {
-          data: req.file.filename,
-          contentType: "image/png",
-        },
-      });
-      newImage
-        .save()
-        .then(() => res.send("DONE UPLOAD"))
-        .catch((e) => {
-          console.log("ERROR UPLOAD");
-        });
-    }
-  });
-});
-app.get("/getupload", (req, res) => {
-  imageModel.find({ name: "testImage" }, (err, data) => {
-    res.send(data);
-  });
-});
-
-const imageModel = require("./model/Image_model");
-app.get("/upload", (req, res) => {
-  res.send("UPLOAD IMAGE");
-});
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.listen(7000 || process.env.PORT, function () {
   console.log(`Server started on port 7000 `);
 });
