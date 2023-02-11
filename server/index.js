@@ -325,13 +325,14 @@ app.get("/details/:prescid", async (req, res) => {
 app.post("/filter/:filter/:filterval", (req, res) => {
   const filter = req.params.filter;
   let filterval = req.params.filterval;
-
+  const pid = req.body.pid;
+  console.log("PID:", pid);
   console.log(filter + filterval);
   try {
     if (filter == "disease") {
       client.query(
-        `select * from prescription where disease=$1 ;`,
-        [filterval],
+        `select * from prescription where disease=$1 and pid=$2;`,
+        [filterval, req.body.pid],
         (err, result) => {
           if (err) {
             res.send(err);
@@ -343,8 +344,8 @@ app.post("/filter/:filter/:filterval", (req, res) => {
       );
     } else if (filter == "hospital") {
       client.query(
-        `select * from prescription where hospital=$1 ; ;`,
-        [filterval],
+        `select * from prescription where hospital=$1 and pid =$2`,
+        [filterval, pid],
         (err, result) => {
           if (err) {
             res.send(err);

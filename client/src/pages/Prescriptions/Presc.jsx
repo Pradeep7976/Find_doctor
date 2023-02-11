@@ -83,8 +83,9 @@ function Doctors() {
       console.log(filter + " " + filterval);
       alert("apply filter first");
     }
+    const dat = { pid: localStorage.getItem("pid") };
     axios
-      .post(port + "/filter/" + filter.toLowerCase() + "/" + filterval)
+      .post(port + "/filter/" + filter.toLowerCase() + "/" + filterval, dat)
       .then((resp) => {
         if (resp.data.length === 0) {
           alert("NO Prescriptions found");
@@ -167,6 +168,9 @@ function Doctors() {
             />
           }
           color={"white"}
+          onClick={() => {
+            navigate("/prescadd");
+          }}
         ></Button>
 
         {/* </Box> */}
