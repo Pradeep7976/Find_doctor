@@ -247,8 +247,16 @@ app.post("/docreg", async (req, res) => {
 
           data.address.map(async (add) => {
             client.query(
-              `insert into adress values($1,$2,$3,$4,$5,$6)`,
-              [did, add.hospital, add.street, add.city, add.time, add.cmpltadd],
+              `insert into adress values($1,$2,$3,$4,$5,$6,$7)`,
+              [
+                did,
+                add.hospital,
+                add.street,
+                add.city,
+                add.cmpltadd,
+                add.ftime,
+                add.time,
+              ],
               (err, res) => {
                 if (err) {
                   console.log("ADDRESS");

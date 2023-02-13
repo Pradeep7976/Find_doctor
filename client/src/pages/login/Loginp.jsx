@@ -79,6 +79,7 @@ c-22.4,3-38.4,9.2-47.8,18.3c-11.2,10.9-13.6,26.7-16.3,45c-3.1,20.8-6.6,44.4-25.3
                   onChange={(e) => {
                     setusername(e.target.value);
                   }}
+                  maxLength={35}
                 />
               </FormControl>
               <FormControl className="text" id="password">
@@ -88,6 +89,7 @@ c-22.4,3-38.4,9.2-47.8,18.3c-11.2,10.9-13.6,26.7-16.3,45c-3.1,20.8-6.6,44.4-25.3
                   onChange={(e) => {
                     setpassword(e.target.value);
                   }}
+                  maxLength={35}
                 />
               </FormControl>
               <Stack spacing={6}>

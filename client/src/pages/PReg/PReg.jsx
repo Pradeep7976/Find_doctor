@@ -15,9 +15,6 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import "./PReg.css";
-import { SmallCloseIcon } from "@chakra-ui/icons";
-import WaveB from "../../components/WaveB/WaveB";
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -95,6 +92,7 @@ function DocForm() {
                 onChange={(e) => {
                   setusername(e.target.value);
                 }}
+                maxLength={35}
               />
             </FormControl>
 
@@ -107,6 +105,7 @@ function DocForm() {
                 onChange={(e) => {
                   setpassword(e.target.value);
                 }}
+                maxLength={35}
               />
             </FormControl>
             <FormControl id="email" isRequired>
@@ -118,6 +117,7 @@ function DocForm() {
                 onChange={(e) => {
                   setemail(e.target.value);
                 }}
+                maxLength={55}
               />
             </FormControl>
             <FormControl isRequired>
@@ -130,6 +130,7 @@ function DocForm() {
                 onChange={(e) => {
                   setaddressd(e.target.value);
                 }}
+                maxLength={150}
               />
             </FormControl>
             <FormControl isRequired>

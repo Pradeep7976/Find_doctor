@@ -14,10 +14,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
   HStack,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -31,7 +27,8 @@ export default function Docadd() {
   const [specialization, setspecialization] = useState("");
   const [yrsofexp, setyrsofexp] = useState(0);
   const [email, setemail] = useState("");
-  const [time, settime] = useState("");
+  const [ftime, setftime] = useState("");
+  const [ttime, setttime] = useState("");
   const [Hospital, setHospital] = useState("");
   const [street, setstreet] = useState("");
   const [city, setcity] = useState("");
@@ -47,14 +44,15 @@ export default function Docadd() {
 
   const addaddress = () => {
     const add = {
-      time: time,
+      ftime: ftime,
+      ttime: ttime,
       hospital: Hospital,
       street: street.toLowerCase(),
       city: city.toLowerCase(),
       cmpltadd: cmpltadd,
     };
     address.push(add);
-    settime("");
+    setftime("");
     setHospital("");
     setstreet("");
     setcity("");
@@ -71,7 +69,7 @@ export default function Docadd() {
       lname: lname,
       fname: fname,
       specialization: specialization.toLowerCase(),
-      yrsofexp: yrsofexp,
+      yrsofexp: yrsofexp.slice(0, 2),
       email: email.toLowerCase(),
       phno: phno,
       fee: fee,
@@ -118,6 +116,7 @@ export default function Docadd() {
                 onChange={(e) => {
                   setfname(e.target.value);
                 }}
+                maxLength={40}
               />
             </FormControl>
 
@@ -131,6 +130,7 @@ export default function Docadd() {
                 onChange={(e) => {
                   setlname(e.target.value);
                 }}
+                maxLength={40}
               />
             </FormControl>
           </Flex>
@@ -146,6 +146,7 @@ export default function Docadd() {
                 onChange={(e) => {
                   setspecialization(e.target.value);
                 }}
+                maxLength={40}
               />
             </FormControl>
 
@@ -155,9 +156,14 @@ export default function Docadd() {
               </FormLabel>
               <Input
                 id="last-name"
-                type={"number"}
+                type="number"
+                maxlength="6"
                 placeholder="Years of experience "
                 onChange={(e) => {
+                  if (e.target.value.length > 2) {
+                    e.target.value = e.target.value.slice(0, 2);
+                  }
+                  setphno(e.target.value.toString());
                   setyrsofexp(e.target.value);
                 }}
               />
@@ -209,6 +215,7 @@ export default function Docadd() {
                 onChange={(e) => {
                   setemail(e.target.value);
                 }}
+                maxLength={40}
               />
             </HStack>
             {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
@@ -228,15 +235,30 @@ export default function Docadd() {
               <Flex>
                 <FormControl mr="5%" isRequired>
                   <FormLabel htmlFor="first-name" fontWeight={"normal"}>
-                    Time
+                    FTime
                   </FormLabel>
                   <Input
                     id="first-name"
                     placeholder="HH:MM (24)"
                     onChange={(e) => {
-                      settime(e.target.value);
+                      setftime(e.target.value);
                     }}
-                    value={time}
+                    value={ftime}
+                    maxlength={5}
+                  />
+                </FormControl>
+                <FormControl mr="5%" isRequired>
+                  <FormLabel htmlFor="first-name" fontWeight={"normal"}>
+                    TTime
+                  </FormLabel>
+                  <Input
+                    id="first-name"
+                    placeholder="HH:MM (24)"
+                    onChange={(e) => {
+                      setttime(e.target.value);
+                    }}
+                    value={ttime}
+                    maxlength={5}
                   />
                 </FormControl>
                 <FormControl mr="5%" isRequired>
@@ -250,6 +272,7 @@ export default function Docadd() {
                       setHospital(e.target.value);
                     }}
                     value={Hospital}
+                    maxlength={25}
                   />
                 </FormControl>
                 <FormControl mr="5%" isRequired>
@@ -263,6 +286,7 @@ export default function Docadd() {
                       setstreet(e.target.value);
                     }}
                     value={street}
+                    maxlength={25}
                   />
                 </FormControl>
                 <FormControl mr="5%" isRequired>
@@ -276,6 +300,7 @@ export default function Docadd() {
                       setcity(e.target.value);
                     }}
                     value={city}
+                    maxlength={25}
                   />
                 </FormControl>
               </Flex>
@@ -292,6 +317,7 @@ export default function Docadd() {
                     setcmpltadd(e.target.value);
                   }}
                   value={cmpltadd}
+                  maxLength={400}
                 />
               </FormControl>
               <ButtonGroup mt="5%" w="100%" paddingTop={2}>
@@ -323,6 +349,7 @@ export default function Docadd() {
                 setdescription(e.target.value);
               }}
               value={description}
+              maxLength={300}
             />
           </FormControl>
           <Flex paddingTop={2}>
@@ -335,6 +362,9 @@ export default function Docadd() {
                 placeholder="Phone no"
                 type={"Number"}
                 onChange={(e) => {
+                  if (e.target.value.length > 10) {
+                    e.target.value = e.target.value.slice(0, 10);
+                  }
                   setphno(e.target.value.toString());
                 }}
               />
@@ -349,6 +379,10 @@ export default function Docadd() {
                 placeholder=" in rupees"
                 type={"number"}
                 onChange={(e) => {
+                  if (e.target.value.length > 5) {
+                    e.target.value = e.target.value.slice(0, 5);
+                  }
+                  setphno(e.target.value.toString());
                   setfee(e.target.value);
                 }}
               />

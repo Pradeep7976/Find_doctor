@@ -24,6 +24,9 @@ function Home() {
   function nav() {
     navigate("/doctors");
   }
+  function addnav() {
+    navigate("/docadd");
+  }
 
   useEffect(() => {
     axios
@@ -73,6 +76,15 @@ function Home() {
                 onClick={nav}
               >
                 Find doctors
+              </Button>
+              <Button
+                bg={"blue.400"}
+                rounded={"full"}
+                color={"white"}
+                _hover={{ bg: "blue.500" }}
+                onClick={addnav}
+              >
+                Regester doctors
               </Button>
               {/* <Button
               bg={"whiteAlpha.300"}

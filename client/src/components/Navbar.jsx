@@ -42,6 +42,7 @@ export default function Simple() {
   function Logout() {
     console.log("Clicked");
     localStorage.clear();
+    navigate("/login");
   }
   return (
     <>
