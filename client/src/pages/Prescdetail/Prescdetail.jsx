@@ -10,6 +10,8 @@ import {
   Heading,
   SimpleGrid,
   useColorModeValue,
+  Flex,
+  Button,
 } from "@chakra-ui/react";
 import Medicinecard from "../../components/Medicinecard/Medicinecard";
 
@@ -44,9 +46,16 @@ export default function Simple() {
     });
     // eslint-disable-next-line
   }, []);
+  function delclick() {
+    axios.get(url + "/delete/" + prescid);
+    navigate("/presc");
+  }
   return (
     <div>
       <Nav />
+      <Flex float={"right"}>
+        <Button onClick={delclick}>delete</Button>
+      </Flex>
       <Container maxW={"100rem"}>
         <SimpleGrid py={{ base: 18, md: 24 }} paddingLeft={"3rem"}>
           <Stack>
@@ -100,7 +109,6 @@ export default function Simple() {
                   return doc.description;
                 })}
               </Text>
-
               <Box>
                 <br />
                 <Text

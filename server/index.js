@@ -116,7 +116,7 @@ app.post("/reg", async (req, res) => {
   const email = req.body.email;
   const address = req.body.address;
   const date = req.body.date;
-  const disease = req.body.gender;
+  const gender = req.body.gender;
   const Users = await patient.findOne({ email });
 
   const year = date.toString().slice(0, 4);
@@ -200,7 +200,31 @@ app.post("/reg", async (req, res) => {
 
   ///
 });
-
+/////////////////////////////////////////////////////////         delete presc                ////////////////////////////////////
+app.get("/delete/:prescid", async (req, res) => {
+  const prescid = req.params.prescid;
+  try {
+    await client.query(
+      `delete from medicine where prescid=$1 `,
+      [prescid],
+      (err, result1) => {
+        client.query(
+          `delete from prescription where prescid=$1`,
+          [prescid],
+          (err, result) => {
+            if (err) {
+              console.log("error");
+            } else {
+              console.log("Done delete");
+            }
+          }
+        );
+      }
+    );
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 /////////////////////////////////////////////////////////          ADD Prescription           //////////////////////////////////////////////////
 
 app.post("/presadd", async (req, res) => {
@@ -268,7 +292,7 @@ app.post("/presadd", async (req, res) => {
   console.log(data);
 });
 
-////////////////////////////////////////////////////       ALL DOCTORS         /////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////       ALL DOCTORS         / ////////////////////////////////////////////////////////////////
 
 app.post("/prescription", async (req, res) => {
   try {

@@ -44,6 +44,7 @@ function DocForm() {
     ) {
       alert("all the form elements should be filled");
     } else {
+      
       const dat = {
         username: usernamed,
         password: passwordd,
@@ -52,6 +53,7 @@ function DocForm() {
         date: date,
         gender: gender,
       };
+      console.log(dat);
 
       axios.post("http://localhost:7000/reg", dat).then((resp) => {
         if (resp.data.log == false) {
